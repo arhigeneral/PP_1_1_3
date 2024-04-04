@@ -13,6 +13,7 @@ public class Util {
     public static Connection getConnection() {
         try {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+            System.out.println("connection got");
             return connection;
         } catch (SQLException e) {
             System.out.println("there is no connection... Exception!");

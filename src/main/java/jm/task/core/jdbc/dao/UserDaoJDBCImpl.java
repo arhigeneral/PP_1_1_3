@@ -22,7 +22,6 @@ public class UserDaoJDBCImpl implements UserDao {
                 "ENGINE = InnoDB\n" +
                 "DEFAULT CHARACTER SET = utf8;\n";
         try(Statement statement = connection.createStatement()) {
-
             statement.executeUpdate(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
