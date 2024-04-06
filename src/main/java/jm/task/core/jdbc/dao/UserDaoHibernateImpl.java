@@ -1,58 +1,101 @@
 package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
+import jm.task.core.jdbc.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static jm.task.core.jdbc.util.HibernateUtil.getSessionFactory;
 
 public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
-
     }
-    private static Session session = getSessionFactory().openSession();
-
+    private final String sqlCreateUserTable = "CREATE TABLE IF NOT EXISTS `mydbtest`.`user` (\n" +
+            "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
+            "  `name` VARCHAR(45) NOT NULL,\n" +
+            "  `lastName` VARCHAR(45) NOT NULL,\n" +
+            "  `age` INT(3) NOT NULL,\n" +
+            "  PRIMARY KEY (`id`))\n" +
+            "ENGINE = InnoDB\n" +
+            "DEFAULT CHARACTER SET = utf8;\n";
+    private final String sqlDeleteUserTable = "drop table if exists user;";
+    private final String sqlSaveUser = "insert into user (name, lastName, age) values(?, ?, ?);";
+    private final String sqlRemoveUserById = "DELETE FROM user WHERE id = ?;";
+    private final String sqlCleanUserTable = "TRUNCATE TABLE user;";
 
     @Override
     public void createUsersTable() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            session.beginTransaction();
+            session.createSQLQuery(sqlCreateUserTable).executeUpdate();
+            session.getTransaction().commit();
+        }
 
     }
 
     @Override
     public void dropUsersTable() {
-
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            session.beginTransaction();
+            session.createSQLQuery(sqlDeleteUserTable).executeUpdate();
+            session.getTransaction().commit();
+        }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        Transaction transaction = session.beginTransaction();
-        String sql = String.format("insert into user (name, lastName, age) values('%s', '%s', %d);",name, lastName, age);
-        session.createSQLQuery(sql).executeUpdate();
-        transaction.commit();
-
+        Logger LOGGER = Logger.getLogger("USER");
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            session.beginTransaction();
+            NativeQuery query = session.createNativeQuery(sqlSaveUser);
+            query.setParameter(1, name);
+            query.setParameter(2, lastName);
+            query.setParameter(3, age);
+            query.executeUpdate();
+            session.getTransaction().commit();
+            LOGGER.log(Level.INFO, String.format("User с именем - %s добавлен в базу данных",name));
+        }
     }
 
     @Override
     public void removeUserById(long id) {
-        Transaction transaction = session.beginTransaction();
-        session.createSQLQuery(String.format("DELETE FROM user WHERE id = %d;",id)).executeUpdate();
-        transaction.commit();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            session.beginTransaction();
+            NativeQuery query = session.createNativeQuery(sqlRemoveUserById);
+            query.setParameter(1, id);
+            query.executeUpdate();
+            session.getTransaction().commit();
+        }
+
     }
 
     @Override
     public List<User> getAllUsers() {
-        return session.createSQLQuery("SELECT * FROM user").addEntity(User.class).getResultList();
+        List<User> users;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            session.beginTransaction();
+            users = session.createQuery("from User").getResultList();
+            session.getTransaction().commit();
+        }
+        return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        Transaction transaction = session.beginTransaction();
-        session.createSQLQuery("TRUNCATE TABLE user;").executeUpdate();
-        transaction.commit();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            session.beginTransaction();
+            session.createSQLQuery(sqlCleanUserTable).executeUpdate();
+            session.getTransaction().commit();
+        }
     }
 }
