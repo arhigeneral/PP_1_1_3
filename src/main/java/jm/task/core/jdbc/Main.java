@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class Main {
     public static void main(String[] args) {
         // реализуйте алгоритм здесь
-        UserDao userDao = new UserDaoJDBCImpl();
+        UserDao userDao = new UserDaoHibernateImpl();
         userDao.createUsersTable();
         Logger LOGGER = Logger.getLogger("USER");
         userDao.saveUser("Name1", "LastName1", (byte) 20);
