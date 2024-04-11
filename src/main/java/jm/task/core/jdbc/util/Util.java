@@ -3,6 +3,8 @@ package jm.task.core.jdbc.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Util {
     // реализуйте настройку соеденения с БД
@@ -11,11 +13,12 @@ public class Util {
     private static final String DB_PASSWORD = "zrhenjq";
 
     public static Connection getConnection() {
+        Logger LOGGER = Logger.getLogger("USER");
         try {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
             return connection;
         } catch (SQLException e) {
-            System.out.println("there is no connection... Exception!");
+            LOGGER.log(Level.INFO, "there is no connection... Exception!");
         }
 
         return null;
