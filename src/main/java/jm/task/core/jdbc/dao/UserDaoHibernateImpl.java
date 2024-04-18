@@ -1,21 +1,14 @@
 package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
-import jm.task.core.jdbc.util.HibernateUtil;
-import org.hibernate.HibernateException;
+import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.query.Query;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static jm.task.core.jdbc.util.HibernateUtil.getSessionFactory;
 
 public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
@@ -35,7 +28,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        try (Session session = Util.getSessionFactory().openSession()){
             session.beginTransaction();
             session.createSQLQuery(sqlCreateUserTable).executeUpdate();
             session.getTransaction().commit();
@@ -45,7 +38,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        try (Session session = Util.getSessionFactory().openSession()){
             session.beginTransaction();
             session.createSQLQuery(sqlDeleteUserTable).executeUpdate();
             session.getTransaction().commit();
@@ -55,7 +48,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Logger LOGGER = Logger.getLogger("USER");
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        try (Session session = Util.getSessionFactory().openSession()){
             session.beginTransaction();
             NativeQuery query = session.createNativeQuery(sqlSaveUser);
             query.setParameter(1, name);
@@ -69,7 +62,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        try (Session session = Util.getSessionFactory().openSession()){
             session.beginTransaction();
             NativeQuery query = session.createNativeQuery(sqlRemoveUserById);
             query.setParameter(1, id);
@@ -82,7 +75,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> users;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        try (Session session = Util.getSessionFactory().openSession()){
             session.beginTransaction();
             users = session.createQuery("from User").getResultList();
             session.getTransaction().commit();
@@ -92,7 +85,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        try (Session session = Util.getSessionFactory().openSession()){
             session.beginTransaction();
             session.createSQLQuery(sqlCleanUserTable).executeUpdate();
             session.getTransaction().commit();

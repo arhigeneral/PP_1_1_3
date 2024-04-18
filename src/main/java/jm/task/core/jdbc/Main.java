@@ -2,18 +2,14 @@ package jm.task.core.jdbc;
 
 import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
-import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
-import jm.task.core.jdbc.util.HibernateUtil;
-import jm.task.core.jdbc.util.Util;
 
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
     public static void main(String[] args) {
         // реализуйте алгоритм здесь
-        UserDao userDao = new UserDaoJDBCImpl();
+        UserDao userDao = new UserDaoHibernateImpl();
         userDao.createUsersTable();
         Logger LOGGER = Logger.getLogger("USER");
         userDao.saveUser("Name1", "LastName1", (byte) 20);
